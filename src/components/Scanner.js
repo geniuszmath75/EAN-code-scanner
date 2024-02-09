@@ -4,7 +4,7 @@ import BookData from "./BookData";
 import axios from "axios";
 
 function Scanner() {
-  const [barcode, setBarcode] = useState(9788327731654);
+  const [barcode, setBarcode] = useState(0);
   const [showScanner, setShowScanner] = useState(true);
   const [showData, setShowData] = useState(false);
   const [properties, setProperties] = useState([]);
@@ -15,8 +15,13 @@ function Scanner() {
         const res = await axios.get(`https://plan.wydawnictwowam.pl/api/plan_get_eproduct_info_by_any_ean/${barcode}`);
         console.log(res.data.success);
         setProperties(res.data.success);
-        setShowData(true); // Dodane w celu pokazania danych po pobraniu z API
-        setShowScanner(false); // Dodane w celu ukrycia skanera po pobraniu z API
+        if(res.data.success.e_title !== null) {
+          setShowData(true);
+          setShowScanner(false);
+        }
+        else {
+          alert("W bazie danych nie ma książki o podanym kodzie.");
+        }
       } catch (err) {
         console.log(err.message);
       }
@@ -30,6 +35,7 @@ function Scanner() {
   const onUpdateScreen = (err, result) => {
     if (result) {
       setBarcode(result.text);
+      console.log(result.text);
     }
   };
 
@@ -53,7 +59,7 @@ function Scanner() {
 
       <div>
         <button onClick={() => {
-          setBarcode(0); // Dodane w celu ponownego uruchomienia skanera po kliknięciu przycisku
+          setBarcode(0);
           setShowScanner(true);
           setShowData(false);
         }}>Skanuj</button>
