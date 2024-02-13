@@ -7,35 +7,52 @@ function Scanner() {
   const [barcode, setBarcode] = useState(0);
   const [showScanner, setShowScanner] = useState(true);
   const [showData, setShowData] = useState(false);
-  const [properties, setProperties] = useState([]);
+  const [skuProperties, setSkuProperties] = useState([]);
+
+  const fetchSkuNumber = async () => {
+    try {
+      const skuRes = await axios.get(
+        `https://wydawnictwowam.pl/json/ean2sku/${barcode}`
+      );
+      const skuNumber = Object.assign({}, skuRes.data).products[0].product.SKU;
+      return skuNumber;
+    } catch {
+      alert("W bazie danych nie ma książki o podanym kodzie.");
+    }
+  };
+
+  const fetchBookData = async (skuNumber) => {
+    try {
+      const skuData = await axios.get(
+        `https://plan.wydawnictwowam.pl/api/plan_get_product_info_by_sku/${skuNumber}`
+      );
+      const bookData = Object.values(skuData.data.success)[0];
+      setSkuProperties(bookData);
+      setShowData(true);
+      setShowScanner(false);
+    } catch {
+      throw new Error("Wystąpił błąd podczas pobierania danych o produkcie.");
+    }
+  };
+
+  const fetchDataSKU = async () => {
+    try {
+      const skuNumber = await fetchSkuNumber();
+      await fetchBookData(skuNumber);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`https://plan.wydawnictwowam.pl/api/plan_get_eproduct_info_by_any_ean/${barcode}`);
-        console.log(res.data.success);
-        setProperties(res.data.success);
-        if(res.data.success.e_title !== null) {
-          setShowData(true);
-          setShowScanner(false);
-        }
-        else {
-          alert("W bazie danych nie ma książki o podanym kodzie.");
-        }
-      } catch (err) {
-        console.log(err.message);
-      }
-    }
-
     if (barcode !== 0) {
-      fetchData();
+      fetchDataSKU();
     }
   }, [barcode]); // Dodane barcode jako zależność, aby useEffect wywoływał się po zmianie kodu kreskowego
 
   const onUpdateScreen = (err, result) => {
     if (result) {
       setBarcode(result.text);
-      console.log(result.text);
     }
   };
 
@@ -51,18 +68,21 @@ function Scanner() {
 
       {showData && (
         <BookData
-          e_title={properties.e_title}
-          e_cena_netto={properties.e_cena_netto}
-          e_typ={properties.e_typ}
+          tytul={skuProperties.tytul}
+          obraz={skuProperties.obraz}
         />
       )}
 
       <div>
-        <button onClick={() => {
-          setBarcode(0);
-          setShowScanner(true);
-          setShowData(false);
-        }}>Skanuj</button>
+        <button
+          onClick={() => {
+            setBarcode(0);
+            setShowScanner(true);
+            setShowData(false);
+          }}
+        >
+          Skanuj
+        </button>
       </div>
     </>
   );
