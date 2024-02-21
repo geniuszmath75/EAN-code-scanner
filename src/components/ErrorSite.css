@@ -1,0 +1,12 @@
+.error-container {
+    border: solid 1px red;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: lightcoral;
+    font-weight: bold;
+}
+
+.error-message {
+    font-size: 0.9rem;
+    color: red;
+}

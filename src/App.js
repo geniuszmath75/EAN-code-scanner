@@ -4,7 +4,9 @@ import Scanner from './components/Scanner';
 function App() {
   return (
       <div className="App">
-          <h1>Scan Barcode</h1>
+        <div className='title-container'>
+          <h1 className='title'>Scan Barcode</h1>
+        </div>
           <Scanner />
       </div>
   );
