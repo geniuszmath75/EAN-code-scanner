@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import BookData from "./BookData";
 import ErrorSite from "./ErrorSite";
-import './Scanner.css';
+import "./Scanner.css";
 import axios from "axios";
 
 function Scanner() {
-  const [barcode, setBarcode] = useState(12);
+  const [barcode, setBarcode] = useState(0);
   const [showScanner, setShowScanner] = useState(true);
   const [showData, setShowData] = useState(false);
   const [skuProperties, setSkuProperties] = useState([]);
@@ -30,6 +30,7 @@ function Scanner() {
         `https://plan.wydawnictwowam.pl/api/plan_get_product_info_by_sku/${skuNumber}`
       );
       const bookData = Object.values(skuData.data.success)[0];
+      console.log(bookData);
       setSkuProperties(bookData);
       setShowData(true);
       setShowScanner(false);
@@ -41,7 +42,6 @@ function Scanner() {
   const fetchDataSKU = async () => {
     try {
       const skuNumber = await fetchSkuNumber();
-      console.log(skuNumber);
       await fetchBookData(skuNumber);
     } catch {
       setError("Wystąpił błąd podczas pobierania danych o produkcie.");
@@ -65,35 +65,34 @@ function Scanner() {
       {showScanner && (
         <div className="scanner-component">
           <BarcodeScannerComponent
-            width={'auto'}
-            height={'100%'}
+            width={"auto"}
+            height={"100%"}
             onUpdate={(err, result) => onUpdateScreen(err, result)}
           />
         </div>
-        
       )}
 
       {showData && !error && (
-        <BookData
-          tytul={skuProperties.tytul}
-          obraz={skuProperties.obraz}
-        />
+        <BookData tytul={skuProperties.tytul} obraz={skuProperties.obraz} />
       )}
 
-      {error && !showScanner && <ErrorSite message={error}/>}
+      {error && !showScanner && <ErrorSite message={error} />}
 
-      <div className="scanner-btn-container">
-        <button
-          className="scanner-btn"
-          onClick={() => {
-            setBarcode(0);
-            setShowScanner(true);
-            setShowData(false);
-          }}
-        >
-          Pokaż skaner
-        </button>
-      </div>
+      {!showScanner && (
+        <div className="scanner-btn-container">
+          <button
+            className="scanner-btn"
+            onClick={() => {
+              setBarcode(0);
+              setShowScanner(true);
+              setShowData(false);
+              setError(null);
+            }}
+          >
+            Pokaż skaner
+          </button>
+        </div>
+      )}
     </>
   );
 }

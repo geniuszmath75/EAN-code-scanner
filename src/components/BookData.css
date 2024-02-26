@@ -1,0 +1,65 @@
+.container-wrapper {
+    margin: 15px 0;
+}
+
+.data-container {
+    text-align: center;
+    border: 3px solid #000;
+}
+
+.header {
+    font-size: 2rem;
+    text-decoration: underline;
+}
+
+.property-container {
+    background-color: #d1ffbd;
+}
+
+.property {
+    font-size: 1.5rem;
+    -webkit-text-stroke: 0.5px #fff;
+    color: #000;
+}
+
+.book-cover {
+    object-fit: cover;
+    width: 31em;
+    height: 44em;
+    margin-bottom: -6px;
+}
+
+@media screen and (max-width: 768px) and (min-width: 480px) {
+    .book-cover {
+         width: 20em;
+         height: 30em;
+    }
+
+    .header {
+        font-size: 1.6em;
+    }
+
+    .property {
+        font-size: 1.2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .container-wrapper {
+        margin: 10px 0;
+    }
+
+    .book-cover {
+         width: 15em;
+         height: 25em;
+         margin-bottom: -4px;
+    }
+
+    .header {
+        font-size: 1.4em;
+    }
+
+    .property {
+        font-size: 1rem;
+    }
+}

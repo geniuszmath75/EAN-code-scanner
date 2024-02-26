@@ -1,6 +1,8 @@
 .scanner-component {
     border: 3px solid black;
-    height: 450px;
+    display: flex;
+    height: 500px;
+    width: 100%;
 }
 
 .scanner-btn-container {
@@ -23,4 +25,22 @@
     color: #fff;
     background-color: #000;
     border: 3px solid #fff;
+}
+
+@media screen and (max-width: 768px) and (min-width: 481px) {
+       .scanner-component {
+            width: 23em;
+            height: 17.3em;
+       }
+}
+
+@media screen and (max-width: 480px) {
+    .scanner-component {
+        height: 250px;
+    }
+
+    .scanner-btn {
+        padding: 6px 26px;
+        margin-top: 5px;
+    }
 }

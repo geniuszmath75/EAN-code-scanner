@@ -7,7 +7,7 @@ function App() {
         <div className='title-container'>
           <h1 className='title'>Scan Barcode</h1>
         </div>
-          <Scanner />
+        <Scanner />
       </div>
   );
 }
