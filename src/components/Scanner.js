@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import BookData from "./BookData";
 import ErrorSite from "./ErrorSite";
@@ -7,15 +7,19 @@ import axios from "axios";
 
 function Scanner() {
   const [barcode, setBarcode] = useState(0);
-  const [showScanner, setShowScanner] = useState(true);
+  const [showScanner, setShowScanner] = useState(false);
   const [showData, setShowData] = useState(false);
+  const [showInput, setShowInput] = useState(false);
   const [skuProperties, setSkuProperties] = useState([]);
   const [error, setError] = useState(null);
+  const [inputEAN, setInputEAN] = useState("");
+
+  const focusInput = useRef(null);
 
   const fetchSkuNumber = async () => {
     try {
       const skuRes = await axios.get(
-        `https://wydawnictwowam.pl/json/ean2sku/${barcode}`
+        `https://wydawnictwowam.pl/json/ean2sku/${inputEAN.length === 0 ? barcode : parseInt(inputEAN)}`
       );
       const skuNumber = Object.assign({}, skuRes.data).products[0].product.SKU;
       return skuNumber;
@@ -43,21 +47,35 @@ function Scanner() {
     try {
       const skuNumber = await fetchSkuNumber();
       await fetchBookData(skuNumber);
+      console.log(showData);
     } catch {
       setError("Wystąpił błąd podczas pobierania danych o produkcie.");
     }
   };
 
   useEffect(() => {
-    if (barcode !== 0) {
+    if (showInput) {
+          focusInput.current.focus();
+        }
+
+    if (barcode !== 0 || inputEAN !== "") {
       fetchDataSKU();
     }
-  }, [barcode]); // Dodane barcode jako zależność, aby useEffect wywoływał się po zmianie kodu kreskowego
+  }, [barcode, inputEAN, showInput]);
 
   const onUpdateScreen = (err, result) => {
     if (result) {
       setBarcode(result.text);
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+  }
+
+  const handleChange = (e) => {
+    setInputEAN(e.target.value);
   };
 
   return (
@@ -72,27 +90,51 @@ function Scanner() {
         </div>
       )}
 
-      {showData && !error && (
+      {showInput && (
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className="input-EAN"
+            ref={focusInput}
+            value={inputEAN}
+            onChange={handleChange}
+          />
+        </form>
+      )}
+
+      {showData && !error && console.log(showData) && (
         <BookData tytul={skuProperties.tytul} obraz={skuProperties.obraz} />
       )}
 
-      {error && !showScanner && <ErrorSite message={error} />}
+      {error && !showScanner && !showInput && <ErrorSite message={error} />}
 
-      {!showScanner && (
-        <div className="scanner-btn-container">
-          <button
-            className="scanner-btn"
-            onClick={() => {
-              setBarcode(0);
-              setShowScanner(true);
-              setShowData(false);
-              setError(null);
-            }}
-          >
-            Pokaż skaner
-          </button>
-        </div>
-      )}
+      <div className="scanner-btn-container">
+        <button
+          className="scanner-btn"
+          onClick={() => {
+            setBarcode(0);
+            setShowScanner(true);
+            setShowData(false);
+            setShowInput(false);
+            setError(null);
+          }}
+        >
+          Kamera
+        </button>
+        <button
+          className="reader-btn"
+          onClick={() => {
+            setBarcode(0);
+            setInputEAN("");
+            setShowInput(true);
+            setShowScanner(false);
+            setShowData(false);
+            setError(null);
+          }}
+        >
+          Czytnik
+        </button>
+      </div>
     </>
   );
 }
