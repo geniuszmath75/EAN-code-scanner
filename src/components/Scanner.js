@@ -34,10 +34,10 @@ function Scanner() {
         `https://plan.wydawnictwowam.pl/api/plan_get_product_info_by_sku/${skuNumber}`
       );
       const bookData = Object.values(skuData.data.success)[0];
-      console.log(bookData);
       setSkuProperties(bookData);
       setShowData(true);
       setShowScanner(false);
+      setShowInput(false);
     } catch {
       setError("Wystąpił błąd podczas pobierania danych o produkcie.");
     }
@@ -47,7 +47,6 @@ function Scanner() {
     try {
       const skuNumber = await fetchSkuNumber();
       await fetchBookData(skuNumber);
-      console.log(showData);
     } catch {
       setError("Wystąpił błąd podczas pobierania danych o produkcie.");
     }
@@ -58,7 +57,7 @@ function Scanner() {
           focusInput.current.focus();
         }
 
-    if (barcode !== 0 || inputEAN !== "") {
+    if (barcode !== 0) {
       fetchDataSKU();
     }
   }, [barcode, inputEAN, showInput]);
@@ -71,7 +70,9 @@ function Scanner() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    if (inputEAN !== "") {
+      fetchDataSKU();
+    }
   }
 
   const handleChange = (e) => {
@@ -91,8 +92,9 @@ function Scanner() {
       )}
 
       {showInput && (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="form-container">
           <input
+            placeholder="Przyłóż kod do czytnika..."
             type="text"
             className="input-EAN"
             ref={focusInput}
@@ -102,17 +104,18 @@ function Scanner() {
         </form>
       )}
 
-      {showData && !error && console.log(showData) && (
+      {showData && !error &&(
         <BookData tytul={skuProperties.tytul} obraz={skuProperties.obraz} />
       )}
 
-      {error && !showScanner && !showInput && <ErrorSite message={error} />}
+      {error && !showScanner && !showInput  && <ErrorSite message={error} />}
 
       <div className="scanner-btn-container">
         <button
           className="scanner-btn"
           onClick={() => {
             setBarcode(0);
+            setInputEAN("");
             setShowScanner(true);
             setShowData(false);
             setShowInput(false);
