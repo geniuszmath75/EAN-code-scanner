@@ -16,7 +16,7 @@ function Scanner() {
 
   const focusInput = useRef(null);
 
-  const fetchSkuNumber = async () => {
+  async function fetchSkuNumber() {
     try {
       const skuRes = await axios.get(
         `https://wydawnictwowam.pl/json/ean2sku/${inputEAN.length === 0 ? barcode : parseInt(inputEAN)}`
@@ -28,7 +28,7 @@ function Scanner() {
     }
   };
 
-  const fetchBookData = async (skuNumber) => {
+  async function fetchBookData(skuNumber) {
     try {
       const skuData = await axios.get(
         `https://plan.wydawnictwowam.pl/api/plan_get_product_info_by_sku/${skuNumber}`
@@ -43,7 +43,7 @@ function Scanner() {
     }
   };
 
-  const fetchDataSKU = async () => {
+  async function fetchDataSKU() {
     try {
       const skuNumber = await fetchSkuNumber();
       await fetchBookData(skuNumber);
@@ -62,20 +62,16 @@ function Scanner() {
     }
   }, [barcode, inputEAN, showInput]);
 
-  const onUpdateScreen = (err, result) => {
-    if (result) {
-      setBarcode(result.text);
-    }
-  };
+  
 
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
     if (inputEAN !== "") {
       fetchDataSKU();
     }
   }
 
-  const handleChange = (e) => {
+  function handleChange(e) {
     setInputEAN(e.target.value);
   };
 
@@ -86,7 +82,13 @@ function Scanner() {
           <BarcodeScannerComponent
             width={"auto"}
             height={"100%"}
-            onUpdate={(err, result) => onUpdateScreen(err, result)}
+            onUpdate={
+              function onUpdateScreen(err, result) {
+                if (result) {
+                  setBarcode(result.text);
+                }
+              }
+            }
           />
         </div>
       )}
