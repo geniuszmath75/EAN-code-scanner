@@ -24,14 +24,14 @@
 
 .book-cover {
     object-fit: cover;
-    width: 31em;
-    height: 44em;
+    width: auto;
+    height: 30em;
     margin-bottom: -6px;
 }
 
 @media screen and (max-width: 768px) and (min-width: 480px) {
     .book-cover {
-         width: 20em;
+         width: auto;
          height: 30em;
     }
 
@@ -50,13 +50,13 @@
     }
 
     .book-cover {
-         width: 14em;
-         height: 18em;
+         width: auto;
+         height: 14em;
          margin-bottom: -4px;
     }
 
     .header {
-        font-size: 1.4em;
+        font-size: 1.4rem;
     }
 
     .property {
